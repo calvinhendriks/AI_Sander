@@ -132,3 +132,14 @@ class Agent:
                     return (x,y)
         return
 
+    def cost(self, board, target):
+        next = board[target[0]][target[1]]
+        if(next == GameObject.WALL):
+            return 1000
+        elif(next == GameObject.SNAKE_BODY):
+            return 1000
+        elif(next == GameObject.EMPTY):
+            return 1
+        elif(next == GameObject.FOOD):
+            return 0
+
