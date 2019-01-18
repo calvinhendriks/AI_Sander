@@ -2,7 +2,7 @@ from tkinter import *
 from snake import Snake
 from board import Board
 
-
+#test
 root = None
 canvas = None
 scale = None
