@@ -48,6 +48,10 @@ class Agent:
         Move.LEFT and Move.RIGHT changes the direction of the snake. In example, if the snake is facing north and the
         move left is made, the snake will go one block to the left and change its direction to west.
         """
+        self.board = board
+        x,y = self.get_food_location(self.board)
+        print(str(x) + "," + str(y))
+
         return Move.STRAIGHT
 
     def should_redraw_board(self):
@@ -86,3 +90,12 @@ class Agent:
         represents the tail and the first element represents the body part directly following the head of the snake.
         When the snake runs in its own body the following holds: head_position in body_parts.
         """
+
+
+    def get_food_location(self, board):
+        for x in range(len(board)):
+            for y in range(len(board[x])):
+                if (board[x][y] == GameObject.FOOD):
+                    return x,y
+        return
+
