@@ -126,17 +126,58 @@ class Agent:
         When the snake runs in its own body the following holds: head_position in body_parts.
         """
     def get_neighbours(self, current, direction):
+        neighbours = []
         iks, yj = current
         
         if(direction == Direction.NORTH):
-            return
-            
-        
+            leftx, lefty = iks - 1, yj
+            straightx, straighty = iks , yj + 1
+            rightx, righty = iks +1, yj
+            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
+                neighbours.append((leftx,lefty,Move.LEFT))
+            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
+                neighbours.append((rightx,righty,Move.RIGHT))
+            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
+                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            return neighbours
+
 
         elif(direction == Direction.EASTH):
-            return
+            leftx, lefty = iks, yj + 1
+            straightx, straighty = iks +1, yj
+            rightx, righty = iks, yj -1
+            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
+                neighbours.append((leftx,lefty,Move.LEFT))
+            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
+                neighbours.append((rightx,righty,Move.RIGHT))
+            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
+                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            return neighbours
 
-     return    
+        elif(direction == Direction.SOUTH):
+            leftx, lefty = iks + 1, yj
+            straightx, straighty = iks, yj -1
+            rightx, righty = iks - 1, yj
+            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
+                neighbours.append((leftx,lefty,Move.LEFT))
+            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
+                neighbours.append((rightx,righty,Move.RIGHT))
+            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
+                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            return neighbours
+
+        elif(direction == Direction.WEST):
+            leftx, lefty = iks, yj -1
+            straightx, straighty = iks -1, yj
+            rightx, righty = iks, yj +1
+            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
+                neighbours.append((leftx,lefty,Move.LEFT))
+            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
+                neighbours.append((rightx,righty,Move.RIGHT))
+            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
+                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            return neighbours
+
 
 
     def get_food_location(self, board):
