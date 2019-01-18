@@ -50,14 +50,14 @@ class Agent:
         move left is made, the snake will go one block to the left and change its direction to west.
         """
         self.board = board
-        x,y = self.get_food_location(self.board)
-        print(str(x) + "," + str(y))
+        tuplea = self.get_food_location(self.board)
+        print(tuplea)
 
         return Move.STRAIGHT
     
     def heuristic(a, b):
-    (x1, y1) = a
-    (x2, y2) = b
+        (x1, y1) = a
+        (x2, y2) = b
     return abs(x1 - x2) + abs(y1 - y2)
 
     def a_star_search(graph, start, goal):
@@ -126,6 +126,6 @@ class Agent:
         for x in range(len(board)):
             for y in range(len(board[x])):
                 if (board[x][y] == GameObject.FOOD):
-                    return x,y
+                    return (x,y)
         return
 
