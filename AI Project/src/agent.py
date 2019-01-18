@@ -52,8 +52,10 @@ class Agent:
         self.board = board
         tuplea = self.get_food_location(self.board)
         print(tuplea)
+        
 
         return Move.STRAIGHT
+
     
 
 
@@ -123,6 +125,18 @@ class Agent:
         represents the tail and the first element represents the body part directly following the head of the snake.
         When the snake runs in its own body the following holds: head_position in body_parts.
         """
+    def get_neighbours(self, current, direction):
+        iks, yj = current
+        
+        if(direction == Direction.NORTH):
+            return
+            
+        
+
+        elif(direction == Direction.EASTH):
+            return
+
+     return    
 
 
     def get_food_location(self, board):
