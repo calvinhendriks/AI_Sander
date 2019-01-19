@@ -50,9 +50,50 @@ class Agent:
         move left is made, the snake will go one block to the left and change its direction to west.
         """
         self.board = board
-        tuplea = self.get_food_location(self.board)
-        print(tuplea)
-        
+        foodlocation= self.get_food_location(self.board)
+        route, cost = self.a_star_search(self.board,head_position,foodlocation,direction)
+        nextlocation = (1,2)
+        print(route.items())
+        print("Next location: " + str(nextlocation))
+        x, y = head_position
+        xnext, ynext = nextlocation
+
+        if(direction == Direction.NORTH):
+            #STRAIGHT
+            if(x == xnext & y + 1 == ynext):
+                return Move.STRAIGHT
+            #LEFT
+            if(x - 1 == xnext & y == ynext):
+                return Move.LEFT
+            #RIGHT
+            if(x + 1 == xnext & y == ynext):
+                return Move.RIGHT
+
+
+        elif(direction == Direction.EAST):
+            if(x + 1 == xnext & y == ynext):
+                return Move.STRAIGHT
+            if(x  == xnext & y + 1 == ynext):
+                return Move.LEFT
+            if(x == xnext & y - 1 == ynext):
+                return Move.RIGHT
+
+        elif(direction == Direction.SOUTH):
+            if(x  == xnext & y - 1 == ynext):
+                return Move.STRAIGHT
+            if(x + 1 == xnext & y == ynext):
+                return Move.LEFT
+            if(x - 1 == xnext & y == ynext):
+                return Move.RIGHT
+
+        elif(direction == Direction.WEST):
+            if(x - 1 == xnext & y == ynext):
+                return Move.STRAIGHT
+            if(x  == xnext & y - 1 == ynext):
+                return Move.LEFT
+            if(x == xnext & y + 1 == ynext):
+                return Move.RIGHT
+
 
         return Move.STRAIGHT
 
@@ -60,28 +101,29 @@ class Agent:
 
 
 
-    def a_star_search(self, graph, start, goal):
+    def a_star_search(self, board, start, goal,direction):
         frontier = PriorityQueue()
         frontier.put(start, 0)
         came_from = {}
         cost_so_far = {}
         came_from[start] = None
         cost_so_far[start] = 0
-    
+        previousdir= direction
         while not frontier.empty():
             current = frontier.get()
         
             if current == goal:
                 break
-        
-            for next in graph.neighbors(current):
-                new_cost = cost_so_far[current] + graph.cost(current, next)
+            print()
+            for next in self.get_neighbours(current,previousdir):
+                print(str(next[0]) + "," + str(next[1]))
+                new_cost = cost_so_far[current] + self.cost(board, next)
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
                     cost_so_far[next] = new_cost
                     priority = new_cost + self.heuristic(goal, next)
                     frontier.put(next, priority)
                     came_from[next] = current
-
+                previousdir = self.get_nextdirection(current,next,previousdir)
         return came_from, cost_so_far
 
     def heuristic(self,a, b):
@@ -128,54 +170,54 @@ class Agent:
     def get_neighbours(self, current, direction):
         neighbours = []
         iks, yj = current
-        
+        print("get_neighbours for: " + str(current))
         if(direction == Direction.NORTH):
             leftx, lefty = iks - 1, yj
             straightx, straighty = iks , yj + 1
-            rightx, righty = iks +1, yj
-            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
-                neighbours.append((leftx,lefty,Move.LEFT))
-            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
-                neighbours.append((rightx,righty,Move.RIGHT))
-            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
-                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            rightx, righty = iks + 1, yj
+            if (leftx > 0 & leftx < 24 & lefty > 0 & lefty < 24 ):
+                neighbours.append((leftx,lefty))
+            if (rightx > 0 & rightx < 24 & righty > 0 & righty < 24 ):
+                neighbours.append((rightx,righty))
+            if (straightx > 0 & straightx < 24 & straightx > 0 & straightx < 24 ):
+                neighbours.append((straightx,straighty))
             return neighbours
 
 
-        elif(direction == Direction.EASTH):
+        elif(direction == Direction.EAST):
             leftx, lefty = iks, yj + 1
             straightx, straighty = iks +1, yj
             rightx, righty = iks, yj -1
-            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
-                neighbours.append((leftx,lefty,Move.LEFT))
-            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
-                neighbours.append((rightx,righty,Move.RIGHT))
-            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
-                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            if (leftx > 0 & leftx < 24 & lefty > 0 & lefty < 24 ):
+                neighbours.append((leftx,lefty))
+            if (rightx > 0 & rightx < 24 & righty > 0 & righty < 24 ):
+                neighbours.append((rightx,righty))
+            if (straightx > 0 & straightx < 24 & straightx > 0 & straightx < 24 ):
+                neighbours.append((straightx,straighty))
             return neighbours
 
         elif(direction == Direction.SOUTH):
             leftx, lefty = iks + 1, yj
             straightx, straighty = iks, yj -1
             rightx, righty = iks - 1, yj
-            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
-                neighbours.append((leftx,lefty,Move.LEFT))
-            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
-                neighbours.append((rightx,righty,Move.RIGHT))
-            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
-                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            if (leftx > 0 & leftx < 24 & lefty > 0 & lefty < 24 ):
+                neighbours.append((leftx,lefty))
+            if (rightx > 0 & rightx < 24 & righty > 0 & righty < 24 ):
+                neighbours.append((rightx,righty))
+            if (straightx > 0 & straightx < 24 & straightx > 0 & straightx < 24 ):
+                neighbours.append((straightx,straighty))
             return neighbours
 
         elif(direction == Direction.WEST):
             leftx, lefty = iks, yj -1
             straightx, straighty = iks -1, yj
             rightx, righty = iks, yj +1
-            if not(leftx < 0 | leftx > 24 | lefty < 0 | lefty > 24 ):
-                neighbours.append((leftx,lefty,Move.LEFT))
-            if not(rightx < 0 | rightx > 24 | righty < 0 | righty > 24 ):
-                neighbours.append((rightx,righty,Move.RIGHT))
-            if not(straightx < 0 | straightx > 24 | straightx < 0 | straightx > 24 ):
-                neighbours.append((straightx,straighty,Move.STRAIGHT))
+            if (leftx > 0 & leftx < 24 & lefty > 0 & lefty < 24 ):
+                neighbours.append((leftx,lefty))
+            if (rightx > 0 & rightx < 24 & righty > 0 & righty < 24 ):
+                neighbours.append((rightx,righty))
+            if (straightx > 0 & straightx < 24 & straightx > 0 & straightx < 24 ):
+                neighbours.append((straightx,straighty))
             return neighbours
 
 
@@ -197,4 +239,44 @@ class Agent:
             return 1
         elif(next == GameObject.FOOD):
             return 0
+        elif(next == GameObject.SNAKE_HEAD):
+            return 1000
 
+    def get_nextdirection(self, current, goal, direction):
+        xnext, ynext = goal
+        x,y = current
+        if(direction == Direction.NORTH):
+            #STRAIGHT
+            if(x == xnext & y + 1 == ynext):
+                return Direction.NORTH
+            #LEFT
+            if(x - 1 == xnext & y == ynext):
+                return Direction.WEST
+            #RIGHT
+            if(x + 1 == xnext & y == ynext):
+                return Direction.EAST
+
+
+        elif(direction == Direction.EAST):
+            if(x + 1 == xnext & y == ynext):
+                return Direction.EAST
+            if(x  == xnext & y + 1 == ynext):
+                return Direction.NORTH
+            if(x == xnext & y - 1 == ynext):
+                return Direction.SOUTH
+
+        elif(direction == Direction.SOUTH):
+            if(x  == xnext & y - 1 == ynext):
+                return Direction.SOUTH
+            if(x + 1 == xnext & y == ynext):
+                return Direction.EAST
+            if(x - 1 == xnext & y == ynext):
+                return Direction.WEST
+
+        elif(direction == Direction.WEST):
+            if(x - 1 == xnext & y == ynext):
+                return Direction.WEST
+            if(x  == xnext & y - 1 == ynext):
+                return Direction.SOUTH
+            if(x == xnext & y + 1 == ynext):
+                return Direction.NORTH
