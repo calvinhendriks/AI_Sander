@@ -1,11 +1,21 @@
 from gameobjects import GameObject
 from move import Move, Direction
-
+import numpy as np
+import random
+import time
 
 class Agent:
 
     def __init__(self):
         """" Constructor of the Agent, can be used to set up variables """
+        self.q_table = np.zeros([5,5,4,5,5,3])
+        self.alpha = 0.6
+        self.gamma = 0.2
+        self.t = time.process_time()
+        self.epsilon = 0.2
+        self.depsilon = 0
+        self.total_moves, self.total_penalties, self.food = 0, 0, 0
+
 
     def get_move(self, board, score, turns_alive, turns_to_starve, direction, head_position, body_parts):
         """This function behaves as the 'brain' of the snake. You only need to change the code in this function for
@@ -48,8 +58,93 @@ class Agent:
         Move.LEFT and Move.RIGHT changes the direction of the snake. In example, if the snake is facing north and the
         move left is made, the snake will go one block to the left and change its direction to west.
         """
-        return Move.STRAIGHT
+        state_pos = head_position
+        state_posx = head_position[0]
+        state_posy = head_position[1]
+        state_dir = direction.value
+        foodlocx, foodlocy = self.get_food_location(board)
 
+        state = (state_posx, state_posy,state_dir, foodlocx, foodlocy)
+
+
+        done = False
+
+        while not done:
+
+            reward = 0
+            if(random.uniform(0,1) < self.epsilon):
+                action = random.choice([-1,0,1])
+            else:
+                action = np.argmax(self.q_table[state])
+
+
+
+            next_state_posx  = Direction.get_new_direction(direction,Move(action)).get_xy_manipulation()[0] + state_pos[0]
+            next_state_posy = Direction.get_new_direction(direction,Move(action)).get_xy_manipulation()[1] + state_pos[1]
+            next_state_dir = Direction.get_new_direction(direction, Move(action)).value
+
+            if(0 <= next_state_posx < 5 and 0 <= next_state_posy < 5):
+                done = True
+
+
+
+
+        next_state = (next_state_posx,next_state_posy,next_state_dir,foodlocx,foodlocy)
+        reward = self.reward(board,(next_state_posx,next_state_posy))
+
+        if reward == 10000:
+            self.food += 1
+
+
+        old_value = self.q_table[state, int(action)]
+        next_max = np.max(self.q_table[next_state])
+
+        new_value = (1 - self.alpha) * old_value + self.alpha * (reward + self.gamma * next_max)
+        self.q_table[state, action] = new_value
+
+
+        self.total_moves += 1
+        self.depsilon = self.total_moves * 0.0000000001
+        if(self.depsilon < self.epsilon and self.epsilon > 0.1):
+            self.epsilon = self.epsilon - self.depsilon
+        else:
+            self.epsilon = 0.1
+
+        print("epsilon: " + str(self.epsilon))
+        try:
+            print("score: " + str(self.food / self.total_penalties) + "\n food: " + str(self.food) + "\n penalties: " + str(self.total_penalties))
+        except:
+            print("niks")
+        return Move(action)
+
+    def get_food_location(self, board):
+        for x in range(len(board)):
+            for y in range(len(board[x])):
+                if (board[x][y] == GameObject.FOOD):
+                    return (x,y)
+
+    def reward(self, board, target):
+
+
+        try:
+            nextn = board[target[0]][target[1]]
+            print(nextn)
+            if(nextn == GameObject.WALL):
+                self.total_penalties += 1
+                return -100
+            elif(nextn == GameObject.SNAKE_BODY):
+                return -100
+            elif(nextn == GameObject.EMPTY):
+                return -1
+            elif(nextn == GameObject.FOOD):
+                return 10000
+            elif(nextn == GameObject.SNAKE_HEAD):
+                self.total_penalties += 1
+                return -100
+        except:
+            print("ik kom hier")
+            self.total_penalties += 1
+            return -100
     def should_redraw_board(self):
         """
         This function indicates whether the board should be redrawn. Not drawing to the board increases the number of
@@ -67,7 +162,7 @@ class Agent:
 
         :return: True if the snake should grow, False if the snake should not grow
         """
-        return True
+        return False
 
     def on_die(self, head_position, board, score, body_parts):
         """This function will be called whenever the snake dies. After its dead the snake will be reincarnated into a
